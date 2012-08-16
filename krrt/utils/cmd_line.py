@@ -82,6 +82,21 @@ def range_validator(value_str, args):
         raise InputException(error_msg + value_str)
     return value
 
+#A function for the range_validator that returns a short help string based on
+#the supplied args
+def range_validator_advice(validator_args):
+    a_type, lb, ub, allow_none, error_msg = validator_args
+    if lb == None and ub == None:
+        return ""
+    adv_str = 'x'
+    if lb != None:
+        adv_str = str(lb) + ' <= ' + adv_str
+    if ub != None:
+        adv_str += ' <= ' + str(ub)
+    if allow_none:
+        adv_str += ', None'
+    return ' {' + adv_str + '}'
+
 #enum_validator: Validate cmd line args that take one of a set of str values.
 # value_str: The command line string representing the argument.
 # args:      A list containing the parameters that the validator requires:
@@ -95,6 +110,11 @@ def enum_validator(value_str, args):
     if v_list != None and value_str not in v_list:
         raise InputException(error_message + value_str)
     return value_str
+
+#A function for the enum_validator that returns a short help string based on
+#the supplied args
+def enum_validator_advice(validator_args):
+    return ' {' + ', '.join(validator_args[0]) + '}'
 
 #bool_validator: Validate Boolean command line args.
 # value_str: The command line string representing the arg.
@@ -112,6 +132,38 @@ def bool_validator(value_str, args):
         raise InputException(error_message + value_str)
     return value
 
+#A function for the bool_validator that returns a short help string
+def bool_validator_advice(validator_args):
+    return ' {True, False}'
+
+#The help function
+#This function prints a usage message to sys.stdout based on the current
+#argument and flag definition. It then exits.
+def print_usage(arg_processor):
+    min_width = max(map(lambda x : len(x),\
+        arg_processor.program_arg_order + arg_processor.program_flag_order))
+    print "Usage: python {} ".format(sys.argv[0])
+    print "The following flags and arguments can be supplied:"
+    print "Flags:"
+    for flag in arg_processor.program_flag_order:
+        print "  {:<{}} : {}".format(flag, min_width,
+            arg_processor.program_flags[flag].description)
+    print "Arguments:"
+    for arg in arg_processor.program_arg_order:
+        if arg_processor.program_args[arg].validator != None:
+            advice_str = arg_processor.advice_functions[arg_processor.program_args[arg].validator](\
+                arg_processor.program_args[arg].validator_args)
+        else:
+            advice_str = ""
+        if arg_processor.program_args[arg].needed:
+            print "  {:<{}} : {}{}".format(arg, min_width,
+                arg_processor.program_args[arg].description, advice_str)
+        else:
+            print "  {:<{}} : {}{} [optional, default: {})".format(arg, min_width,
+                arg_processor.program_args[arg].description, advice_str,
+                arg_processor.program_args[arg].default_value)
+    sys.exit(0)
+
 #The main class
 #-------------------------------------------------------------------------------
 
@@ -126,15 +178,26 @@ class ArgProcessor:
         self.program_arg_order = []
         self.program_flags = {}
         self.program_flag_order = []
+        self.validators = []
+        self.advice_functions = {}
+        #Register the pre-made validators
+        self.register_validator(range_validator, range_validator_advice)
+        self.register_validator(enum_validator, enum_validator_advice)
+        self.register_validator(bool_validator, bool_validator_advice)
         #Add the quiet flag:
-        self.add_program_flag('--quiet',\
+        self.add_program_flag('--quiet',
             FlagDefinition('quiet', None, 'Suppress non-essential output'))
-
+        #Add the help flag
+        self.add_program_flag('--help',
+            FlagDefinition('help', print_usage, "Display this notice"))
+        
     #This method adds a program argument.
     #param:          The '-' prefixed param string of the argument.
     #arg_definition: The ArgDefinition object describing the argument.
     def add_program_arg(self, param, arg_definition):
         assert param not in self.program_args, "Error: parameter name in use."
+        assert arg_definition.validator == None or\
+            arg_definition.validator in self.validators, "Error: unregistered validator"
         self.program_args[param] = arg_definition
         self.program_arg_order.append(param)
 
@@ -146,6 +209,11 @@ class ArgProcessor:
         self.program_flags[flag] = flag_definition
         self.program_flag_order.append(flag)
         vars(self)[flag_definition.var_name] = False
+
+    #This method adds a validator and maps it to the relevant advice function
+    def register_validator(self, validator, validator_advice):
+        self.validators.append(validator)
+        self.advice_functions[validator] = validator_advice
 
     #Call this function to parse the input arguments
     def parse_args(self):
