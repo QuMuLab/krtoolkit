@@ -2,7 +2,7 @@
 from krrt.utils.experimentation import get_lines
 
 class DTG(object):
-    def __init__(self, var_info):
+    def __init__(self, var_lines):
         
         try:
             from pygraph.classes.digraph import digraph
@@ -11,9 +11,11 @@ class DTG(object):
             return None
         
         # Parse the info
-        self.name = var_info.split()[0]
-        domain_size = int(var_info.split()[1])
-        self.axiom_layer = int(var_info.split()[2])
+        assert 'begin_variable' == var_lines.pop(0)
+        
+        self.name = var_lines.pop(0)
+        self.axiom_layer = int(var_lines.pop(0))
+        domain_size = int(var_lines.pop(0))
         
         # Create the graph
         #  Node: int corresponding to the value of the SAS+ variable
@@ -24,7 +26,9 @@ class DTG(object):
         
         # Add a node for each value in the domain
         for i in range(domain_size):
-            self.graph.add_node(i)
+            self.graph.add_node(i, [('fluent',var_lines.pop(0))])
+        
+        assert 'end_variable' == var_lines.pop(0)
         
         # Create the accepting states
         self.goal_vals = set([])
@@ -162,7 +166,7 @@ def parseDTG(filename):
     DTG_lines = get_lines(filename, 'end_SG', 'begin_CG')
     
     #--- Pull in the variables (just for a count)
-    Var_lines = get_lines(filename, 'begin_variables', 'end_variables')
+    Var_lines = get_lines(filename, 'end_metric', 'begin_state')
     
     #--- Build all of the DTGs
     dtgs = []
@@ -174,7 +178,7 @@ def parseDTG(filename):
         while DTG_lines and DTG_lines[0] != 'end_DTG':
             lines.append(DTG_lines.pop(0))
             
-        dtgs.append(DTG(Var_lines[i]))
+        dtgs.append(DTG(Var_lines))
         dtgs[-1].parse(lines)
         
         #-- Discard the last line which is 'end_DTG'
