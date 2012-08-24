@@ -48,10 +48,10 @@ class DTG(object):
     
     def dot(self, augment = True):
         
-        import pygraph
+        from pygraph.readwrite.dot import write
         
         # Get the dot encoding
-        dot = pygraph.readwrite.dot.write(self.graph, weighted = True)
+        dot = write(self.graph, weighted = True)
         if (not augment) or (self.domain_size == 0) or (len(self.graph.edges()) == 0):
             return dot
 
