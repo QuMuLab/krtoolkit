@@ -147,7 +147,8 @@ def plot(x, y,
          disable_x_tics = False,
          no_scatter = False,
          nosymbols = False,
-         makesquare = False):
+         makesquare = False,
+         x1line = False):
 
     try:
         import pylab
@@ -250,6 +251,9 @@ def plot(x, y,
     
     if xyline:
         ax.plot([min([BOT_X, BOT_Y]), max([TOP_X, TOP_Y])],[min([BOT_X, BOT_Y]), max([TOP_X, TOP_Y])], c=xy_line_col)
+
+    if x1line:
+        ax.plot([min([BOT_X, BOT_Y]), max([TOP_X, TOP_Y])],[1.0, 1.0], c=xy_line_col)
     
     ax.set_xlim(BOT_X, TOP_X)
     #ax.set_xlim(BOT_NUMS[0], TOP_NUMS[0])
