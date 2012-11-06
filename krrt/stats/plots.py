@@ -180,12 +180,12 @@ def plot(x, y,
 
     if disable_x_tics:
         if y_log:
-            ax = pylab.axes([0.16,0.14,0.95-0.16,0.95-0.14]) # Use this when 10^-1 kicks out the y-label
+            ax = pylab.axes([0.17,0.14,0.95-0.17,0.95-0.14]) # Use this when 10^-1 kicks out the y-label
         else:
             ax = pylab.axes([0.14,0.14,0.95-0.14,0.95-0.14])
     else:
         if y_log:
-            ax = pylab.axes([0.16,0.22,0.95-0.16,0.95-0.22])
+            ax = pylab.axes([0.17,0.22,0.95-0.17,0.95-0.22])
         else:
             ax = pylab.axes([0.14,0.2,0.95-0.14,0.95-0.2])
 
