@@ -269,10 +269,12 @@ def plot(x, y,
     pylab.ylabel(y_label)
 
     if names:
+        if no_scatter:
+            handles = [h[0] for h in handles]
         if legend_name:
-            pylab.legend([h[0] for h in handles], names, loc="best", title=legend_name)
+            pylab.legend(handles, names, loc="best", title=legend_name)
         else:
-            pylab.legend([h[0] for h in handles], names, loc="best")
+            pylab.legend(handles, names, loc="best")
 
     if graph_name:
         pylab.title(graph_name)
