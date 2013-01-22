@@ -148,7 +148,8 @@ def plot(x, y,
          no_scatter = False,
          nosymbols = False,
          makesquare = False,
-         y1line = False):
+         y1line = False,
+         yerr = None):
 
     try:
         import pylab
@@ -163,6 +164,8 @@ def plot(x, y,
     if x[0].__class__ != list:
         x = [x]
         y = [y]
+        if yerr:
+            yerr = [yerr]
 
     if not col:
         if len(x) > len(SYMBOLS):
@@ -200,23 +203,30 @@ def plot(x, y,
     handles = []
     xy_line_col = 'b'
 
+    if yerr:
+        plot_func = ax.errorbar
+        plot_args = lambda i: {'yerr':yerr[i]}
+    else:
+        plot_func = ax.plot
+        plot_args = lambda i: {}
+
     for i in range(len(x)):
 
         if col:
             if no_scatter:
                 if nosymbols:
-                    handles.append(ax.plot(x[i], y[i], c=COLOURS[i]))
+                    handles.append(plot_func(x[i], y[i], c=COLOURS[i], **plot_args(i)))
                 else:
-                    handles.append(ax.plot(x[i], y[i], c=COLOURS[i], marker='s'))
+                    handles.append(plot_func(x[i], y[i], c=COLOURS[i], marker='s', **plot_args(i)))
             else:
                 handles.append(ax.scatter(x[i], y[i], s=40, c=COLOURS[i], marker='s'))
         else:
             xy_line_col = 'k'
             if no_scatter:
                 if nosymbols:
-                    handles.append(ax.plot(x[i], y[i], c='k'))
+                    handles.append(plot_func(x[i], y[i], c='k', **plot_args(i)))
                 else:
-                    handles.append(ax.plot(x[i], y[i], c='k', marker=SYMBOLS[i]))
+                    handles.append(plot_func(x[i], y[i], c='k', marker=SYMBOLS[i], **plot_args(i)))
             else:
                 handles.append(ax.scatter(x[i], y[i], s=40, c='k', marker=SYMBOLS[i]))
 
