@@ -149,7 +149,11 @@ def plot(x, y,
          nosymbols = False,
          makesquare = False,
          y1line = False,
-         yerr = None):
+         yerr = None,
+         minX = False,
+         minY = False,
+         maxX = False,
+         maxY = False):
 
     try:
         import pylab
@@ -262,6 +266,15 @@ def plot(x, y,
         TOP_X = max(TOP_Y, TOP_X)
         BOT_X = min(BOT_X, BOT_Y)
         BOT_Y = min(BOT_X, BOT_Y)
+
+    if maxX:
+        TOP_X = maxX
+    if maxY:
+        TOP_Y = maxY
+    if minX:
+        BOT_X = minX
+    if minY:
+        BOT_Y = minY
 
     if xyline:
         ax.plot([min([BOT_X, BOT_Y]), max([TOP_X, TOP_Y])],[min([BOT_X, BOT_Y]), max([TOP_X, TOP_Y])], c=xy_line_col)
