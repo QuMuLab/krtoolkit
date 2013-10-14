@@ -166,7 +166,7 @@ def parseDTG(filename):
     DTG_lines = get_lines(filename, 'end_SG', 'begin_CG')
     
     #--- Pull in the variables (just for a count)
-    Var_lines = get_lines(filename, 'end_metric', 'begin_state')
+    Var_lines = get_lines(filename, 'begin_variables', 'end_variables')
     
     #--- Build all of the DTGs
     dtgs = []
