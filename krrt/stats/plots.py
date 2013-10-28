@@ -221,7 +221,7 @@ def plot(x, y,
                 if nosymbols:
                     handles.append(plot_func(x[i], y[i], c=COLOURS[i], **plot_args(i)))
                 else:
-                    handles.append(plot_func(x[i], y[i], c=COLOURS[i], marker='s', **plot_args(i)))
+                    handles.append(plot_func(x[i], y[i], c=COLOURS[i], marker=SYMBOLS[i], **plot_args(i)))
             else:
                 handles.append(ax.scatter(x[i], y[i], s=40, c=COLOURS[i], marker='s'))
         else:
