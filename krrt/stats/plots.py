@@ -50,7 +50,8 @@ params_twocolumn = {'backend': 'eps',
                     'font.serif': 'Times New Roman',
                     #'font.sans-serif': 'Helvetica',
                     'text.usetex': True,
-                    'figure.figsize': get_figsize(250)}
+                    'figure.figsize': get_figsize(250),
+                    'figure.autolayout': True}
 
 # Medium size charts (not yet complete)
 params_onecolumn = {'backend': 'eps',
@@ -68,7 +69,8 @@ params_onecolumn = {'backend': 'eps',
                     #'font.sans-serif': 'Helvetica',
                     'text.usetex': True,
                     'ps.usedistiller': 'xpdf',
-                    'figure.figsize': get_figsize(500)}
+                    'figure.figsize': get_figsize(500),
+                    'figure.autolayout': True}
 
 def plot_from_file(csvfile, title = None, use_header = True, xlog = False, ylog = False, no_x_tics = False, noxy = False, no_scatter = False, bw = False, mult_plots = False, xlabel = "", ylabel = "", legendname = "Legend", nosymbols = False):
     from krrt.utils import load_CSV
