@@ -1,5 +1,5 @@
 # The following modules are the available utils
-from experimentation import get_value, match_value, get_lines, run_experiment
+from experimentation import get_value, match_value, get_lines, run_experiment, run_command
 from fileio import read_file, write_file, append_file, load_CSV, save_CSV
 
 #####################
