@@ -17,37 +17,23 @@ def parseFile(file):
     file_lines = f.readlines()
     f.close()
     
-    numVars = 0
-    numClauses = 0
-    
     while len(file_lines) > 0:
         line = file_lines.pop(0)
         
         # Only deal with lines that aren't comments
-        if not pComment.match(line):
-            m = pStats.match(line)
+        if not pComment.match(line) and not pStats.match(line):
+            nums = line.rstrip('\n').split(' ')
+            cls = []
+            for lit in nums[:-1]:
+                if lit != '':
+                    num = abs(int(lit))
+                    if int(lit) < 0:
+                        cls.append(Not(num))
+                    else:
+                        cls.append(num)
             
-            if m:
-                numVars = int(m.group(1))
-                numClauses = int(m.group(2))
-                
-            else:
-                nums = line.rstrip('\n').split(' ')
-                list = []
-                for lit in nums[0:-1]:
-                    if lit != '':
-                        num = abs(int(lit))
-                        sign = 1
-                        if int(lit) < 0:
-                            sign = -1
-                            
-                        list.append(Literal(num, sign))
-                    
-                if len(list) > 0:
-                    formula.addClause(Clause(list))
-            
-        
-    formula.setStats(numVars, numClauses)
-        
+            if len(cls) > 0:
+                formula.addClause(cls)
+    
     return formula
     
