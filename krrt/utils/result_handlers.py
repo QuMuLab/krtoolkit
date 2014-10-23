@@ -71,7 +71,7 @@ class ResultSet(object):
         return self.results[index]
     
     def __iter__(self):
-        return self.results.__iter__()
+        return self.results.values().__iter__()
     
     def get_ids(self):
         return self.results.keys()
