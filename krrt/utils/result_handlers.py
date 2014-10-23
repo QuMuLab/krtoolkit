@@ -70,5 +70,9 @@ class ResultSet(object):
     def __getitem__(self, index):
         return self.results[index]
     
+    def __iter__(self):
+        return self.results.__iter__()
+    
     def get_ids(self):
         return self.results.keys()
+
