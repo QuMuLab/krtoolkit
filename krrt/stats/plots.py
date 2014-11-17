@@ -27,7 +27,7 @@ Usage: python plots.py <flag> -option <value> ...
 
 #SYMBOLS = ['-','--','-.',':','.',',','o','^','v','<','>','s','+','x','D','d','1','2','3','4','h','H','p']
 SYMBOLS = ['s', 'x', 'o', '^', '>', 'v', '<', 'd', 'p', 'h', '8']
-COLOURS = ['b','g','r','c','m','y','k']
+COLOURS = ['r','b','g','c','m','y','k']
 
 def get_figsize(fig_width_pt):
     import math
