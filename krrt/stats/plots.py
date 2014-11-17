@@ -149,6 +149,7 @@ def plot(x, y,
          disable_x_tics = False,
          no_scatter = False,
          nosymbols = False,
+         symbol_list = False,
          makesquare = False,
          y1line = False,
          yerr = None,
@@ -172,6 +173,10 @@ def plot(x, y,
         y = [y]
         if yerr:
             yerr = [yerr]
+    
+    global SYMBOLS
+    if symbol_list:
+        SYMBOLS = symbol_list
 
     if not col:
         if len(x) > len(SYMBOLS):
@@ -182,7 +187,6 @@ def plot(x, y,
         if len(x) > len(COLOURS):
             print "Warning: Too many types (%d) for only %d colours." % (len(x), len(COLOURS))
             return
-
 
     pylab.figure(1)
     pylab.clf()
@@ -225,7 +229,7 @@ def plot(x, y,
                 else:
                     handles.append(plot_func(x[i], y[i], c=COLOURS[i], marker=SYMBOLS[i], **plot_args(i)))
             else:
-                handles.append(ax.scatter(x[i], y[i], s=40, c=COLOURS[i], marker='s'))
+                handles.append(ax.scatter(x[i], y[i], s=40, c=COLOURS[i], marker=SYMBOLS[i]))
         else:
             xy_line_col = 'k'
             if no_scatter:
