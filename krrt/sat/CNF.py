@@ -211,7 +211,7 @@ class Formula:
         write_file(sourceFile, output)
 
     def writeMapping(self, sourceFile):
-        write_file(sourceFile, ["%d %s" % (self.mapping[var], str(var)) for var in self.variables])
+        write_file(sourceFile, ["%d %s" % (k,v) for (k,v) in sorted([(self.mapping[var], str(var)) for var in self.variables])])
 
 
 class WeightedFormula(Formula):
