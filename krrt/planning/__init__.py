@@ -62,7 +62,7 @@ def parse_output_FF(file_name):
 
     return Plan(actions)
 
-def parse_output_lapkt(file_name):
+def parse_output_ipc(file_name):
     from krrt.utils import read_file
 
     # Check for the failed solution
