@@ -78,15 +78,15 @@ def parse_output_ipc(file_name):
     return Plan(actions)
 
 def parse_output_popf(file_name):
-    from krrt.utils import match_value, get_lines
+    from krrt.utils import match_value, read_file
 
-    # Check for the failed solution
-    if not match_value(file_name, '.*;;;; Solution Found.*'):
-        print "No solution."
-        return None
+    popf_lines = read_file(file_name)
+    assert '; Plan found with metric' in popf_lines[0]
+    assert '; States evaluated' in popf_lines[1]
+    assert '; Time' in popf_lines[2]
 
     # Get the plan lines
-    popf_actions = get_lines(file_name, lower_bound = ';;;; Solution Found')[1:]
+    popf_actions = popf_lines[3:]
 
     time_slots = [popf_actions[0].split(':')[0]]
     for act in popf_actions:
@@ -100,6 +100,18 @@ def parse_output_popf(file_name):
         for act in actions:
             action_line = act.split('(')[1].split(')')[0]
             layered_solution[-1].append(Action(action_line))
+
+    return layered_solution
+
+def parse_output_mp(file_name):
+    from krrt.utils import read_file
+
+    mp_lines = read_file(file_name)
+
+    layered_solution = []
+    for line in mp_lines:
+        acts = line.split(': ')[1].split()
+        layered_solution.append(map(Action, ["%s %s" % (a.split('(')[0], ' '.join(a.split('(')[1][:-1].split(','))) for a in acts]))
 
     return layered_solution
 
