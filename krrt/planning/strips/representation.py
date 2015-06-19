@@ -171,6 +171,7 @@ def parse_problem(pddl_domain_name, pddl_file_name):
         DEL = set([])
 
         for p in a.precondition:
+            assert not p.negated, "Error: Cannot handle negative preconditions"
             PRE.add(FMAP[' '.join([p.predicate] + list(p.args))])
 
         for cond, fact in a.add_effects:
