@@ -1,7 +1,7 @@
 
 from krrt.utils import read_file
 from krrt.planning.pddl import open as parsePDDL
-from krrt.planning.pddl import Atom, Conjunction, NegatedAtom
+from krrt.planning.pddl import Assign, Atom, Conjunction, NegatedAtom
 from krrt.planning.pddl.instantiate import explore
 from krrt.planning import Action as GroundAction
 
@@ -70,6 +70,10 @@ def parse_init_state(pddl_domain_name, pddl_file_name):
     # Lift the initial state
     inits = set([])
     for init in t.init:
+        # We don't want to keep around the trivial equality constraints
+        if Assign == init.__class__:
+            continue
+
         if Atom != init.__class__:
             print "Error: Init condition not an Atom -- " + str(init.__class__)
             return set([])
@@ -79,9 +83,7 @@ def parse_init_state(pddl_domain_name, pddl_file_name):
         for arg in init.args:
             fluent += ' ' + str(arg)
 
-        # We don't want to keep around the trivial equality constraints
-        if fluent[0] != '=':
-            inits.add(Fluent(fluent))
+        inits.add(Fluent(fluent))
 
     return inits
 
