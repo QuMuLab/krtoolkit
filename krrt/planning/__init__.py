@@ -111,7 +111,7 @@ def parse_output_mp(file_name):
     layered_solution = []
     for line in mp_lines:
         acts = line.split(': ')[1].split()
-        layered_solution.append(map(Action, ["%s %s" % (a.split('(')[0], ' '.join(a.split('(')[1][:-1].split(','))) for a in acts]))
+        layered_solution.append(map(Action, [("%s %s" % (a.split('(')[0], ' '.join(a.split('(')[1][:-1].split(',')))).strip() for a in acts]))
 
     return layered_solution
 
