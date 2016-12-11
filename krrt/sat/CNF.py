@@ -561,6 +561,9 @@ class Variable(object):
     def var(self):
         return self
 
+    def negate(self):
+        return Not(self)
+
     def __str__(self):
         return str(self.obj)
 
@@ -586,6 +589,9 @@ class Not(Variable):
     @property
     def var(self):
         return self.obj
+
+    def negate(self):
+        return self.var
 
     def __str__(self):
         return "~" + str(self.obj)
