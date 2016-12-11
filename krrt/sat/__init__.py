@@ -2,3 +2,4 @@
 import CNF
 import Dimacs
 import DPLL
+import dDNNF
