@@ -87,7 +87,7 @@ class dDNNF:
 
     def count(self, lits = set()):
         self.root.reset()
-        return self.count(lits)
+        return self.root.count(lits)
 
     def condition(self, lits):
         self.root.reset()
@@ -108,7 +108,13 @@ def parseNNF(fname):
 
         parts = line.split()
 
-        if 'L' == parts[0]:
+        if 'A 0' == line:
+            nodes.append(True)
+
+        elif 'O 0 0' == line:
+            nodes.append(False)
+
+        elif 'L' == parts[0]:
             num = int(parts[1])
             lit = CNF.Variable(abs(num))
             if num < 0:
