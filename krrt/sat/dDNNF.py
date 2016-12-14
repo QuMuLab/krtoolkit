@@ -5,16 +5,46 @@ from krrt.sat import CNF
 class Node:
 
     def __init__(self, childs = []):
+        assert None not in childs, str(childs)
         self.children = childs
         self._count = -1
-        self._conditioned = None
+        self._replacement = None
 
     def reset(self):
         if -1 != self._count:
             for ch in self.children:
                 ch.reset()
             self._count = -1
-            self._conditioned = None
+            self._replacement = None
+
+    def crawl(self, seen):
+        if self not in seen:
+            seen.add(self)
+            for ch in self.children:
+                if ch not in [True,False]:
+                    ch.crawl(seen)
+
+    def condition(self, lits):
+        if self._replacement is None:
+            def recursively_apply(ch):
+                if ch in [True, False]:
+                    return ch
+                else:
+                    return ch.condition(lits)
+            vals = [recursively_apply(ch) for ch in self.children]
+            self._replacement = self._compress(vals)
+        return self._replacement
+
+    def simplify(self):
+        if self._replacement is None:
+            def recursively_apply(ch):
+                if ch in [True, False]:
+                    return ch
+                else:
+                    return ch.simplify()
+            vals = [recursively_apply(ch) for ch in self.children]
+            self._replacement = self._compress(vals)
+        return self._replacement
 
 
 class And(Node):
@@ -24,19 +54,16 @@ class And(Node):
             self._count = reduce(lambda x,y: x*y, [ch.count(lits) for ch in self.children])
         return self._count
 
-    def condition(self, lits):
-        if self.conditioned is None:
-            vals = [ch.condition(lits) for ch in self.children]
-            vals = filter(lambda x: x != True, vals)
-            if False in vals:
-                self.conditioned = False
-            elif 0 == len(vals):
-                self.conditioned = True
-            elif 1 == len(vals):
-                self.conditioned = vals[0]
-            else:
-                self.conditioned = And(vals)
-        return self.conditioned
+    def _compress(self, vals):
+        new_vals = filter(lambda x: x != True, vals)
+        if False in new_vals:
+            return False
+        elif 0 == len(new_vals):
+            return True
+        elif 1 == len(new_vals):
+            return new_vals[0]
+        else:
+            return And(new_vals)
 
 
 class Or(Node):
@@ -46,44 +73,55 @@ class Or(Node):
             self._count = sum([ch.count(lits) for ch in self.children])
         return self._count
 
-    def condition(self, lits):
-        if self.conditioned is None:
-            vals = [ch.condition(lits) for ch in self.children]
-            vals = filter(lambda x: x != False, vals)
-            if True in vals:
-                self.conditioned = True
-            elif 0 == len(vals):
-                self.conditioned = False
-            elif 1 == len(vals):
-                self.conditioned = vals[0]
-            else:
-                self.conditioned = Or(vals)
-        return self.conditioned
+    def _compress(self, vals):
+        new_vals = filter(lambda x: x != False, vals)
+        if True in new_vals:
+            return True
+        elif 0 == len(new_vals):
+            return False
+        elif 1 == len(new_vals):
+            return new_vals[0]
+        else:
+            return Or(vals)
 
 
 class Lit(Node):
 
     def __init__(self, lit):
         self.lit = lit
+        self._replacement = None
+
+    def crawl(self, seen):
+        seen.add(self)
 
     def count(self, lits):
         return {True: 0, False: 1}[self.lit.negate() in lits]
 
     def condition(self, lits):
-        if self.conditioned is None:
+        if self._replacement is None:
             if self.lit in lits:
-                self.conditioned = True
+                self._replacement = True
             elif self.lit.negate() in lits:
-                self.conditioned = False
+                self._replacement = False
             else:
-                self.conditioned = Lit(self.lit)
-        return self.conditioned
+                self._replacement = Lit(self.lit)
+        return self._replacement
+
+    def simplify(self):
+        if self._replacement is None:
+            self._replacement = Lit(self.lit)
+        return self._replacement
 
 
 class dDNNF:
 
     def __init__(self, root):
         self.root = root
+
+    def size(self):
+        seen = set()
+        self.root.crawl(seen)
+        return len(seen)
 
     def count(self, lits = set()):
         self.root.reset()
@@ -93,6 +131,9 @@ class dDNNF:
         self.root.reset()
         return dDNNF(self.root.condition(lits))
 
+    def simplify(self):
+        self.root.reset()
+        return dDNNF(self.root.simplify())
 
 
 def parseNNF(fname):
@@ -102,7 +143,7 @@ def parseNNF(fname):
     assert nNodes == len(lines)
 
     badlist = set()
-    nodes = [None]
+    nodes = []
 
     for line in lines:
 
