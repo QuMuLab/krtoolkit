@@ -11,9 +11,10 @@ class Node:
         self._replacement = None
 
     def reset(self):
-        if -1 != self._count:
+        if (-1 != self._count) or (self._replacement is not None):
             for ch in self.children:
-                ch.reset()
+                if ch not in [True, False]:
+                    ch.reset()
             self._count = -1
             self._replacement = None
 
@@ -65,6 +66,18 @@ class And(Node):
         else:
             return And(new_vals)
 
+    def is_smooth(self):
+        if self._replacement is None:
+            chs = filter(lambda x: x not in [True,False], self.children)
+            chvals = [ch.is_smooth() for ch in chs]
+            if False in chvals:
+                return False
+            subvars = chs[0]._replacement
+            for ch in chs:
+                subvars = subvars | ch._replacement
+            self._replacement = subvars
+        return True
+
 
 class Or(Node):
 
@@ -84,11 +97,29 @@ class Or(Node):
         else:
             return Or(vals)
 
+    def is_smooth(self):
+        if self._replacement is None:
+            chs = filter(lambda x: x not in [True,False], self.children)
+            chvals = [ch.is_smooth() for ch in chs]
+            if False in chvals:
+                return False
+            subvars = chs[0]._replacement
+            for ch in chs:
+                if (len(ch._replacement) != len(subvars)) or \
+                   (len(ch._replacement | subvars) != len(subvars)):
+                    return False
+            self._replacement = subvars
+        return True
+
 
 class Lit(Node):
 
     def __init__(self, lit):
         self.lit = lit
+        self.reset()
+
+    def reset(self):
+        self._count = -1
         self._replacement = None
 
     def crawl(self, seen):
@@ -112,6 +143,10 @@ class Lit(Node):
             self._replacement = Lit(self.lit)
         return self._replacement
 
+    def is_smooth(self):
+        self._replacement = set([self.lit.var])
+        return True
+
 
 class dDNNF:
 
@@ -134,6 +169,10 @@ class dDNNF:
     def simplify(self):
         self.root.reset()
         return dDNNF(self.root.simplify())
+
+    def is_smooth(self):
+        self.root.reset()
+        return self.root.is_smooth()
 
 
 def parseNNF(fname):

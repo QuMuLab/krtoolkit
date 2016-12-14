@@ -588,10 +588,10 @@ class Not(Variable):
 
     @property
     def var(self):
-        return self.obj
+        return self.negate()
 
     def negate(self):
-        return self.var
+        return Variable(self.obj)
 
     def __str__(self):
         return "~" + str(self.obj)
