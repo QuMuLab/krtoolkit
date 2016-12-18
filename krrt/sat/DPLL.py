@@ -5,6 +5,45 @@ from krrt.sat.Dimacs import *
 import random
 from time import clock
 
+
+def propagate(theory):
+    # We assume that either unit prop or pure literal updates will change the
+    #  number of clauses in the theory, so we repeat this process until the
+    #  clause count converges.
+    cls_count = 0
+
+    while theory.num_clauses != cls_count:
+        cls_count = theory.num_clauses
+        purelit_prop(theory)
+        unit_prop(theory)
+
+
+def purelit_prop(theory):
+    # Get all of the literals seen
+    all_lits = set()
+    unit_lits = set()
+    for c in theory.clauses:
+        if 1 == len(c):
+            unit_lits.add(list(c)[0])
+        for l in c:
+            all_lits.add(l)
+
+    # Find the pure non-unit clause lits
+    pure_lits = set()
+    for v in theory.variables:
+        # Check that it isn't already a unit clause
+        if (v not in unit_lits) and (v.negate() not in unit_lits):
+            # Check that it is pure
+            if (v in all_lits) and (v.negate() not in all_lits):
+                pure_lits.add(v)
+            elif (v not in all_lits) and (v.negate() in all_lits):
+                pure_lits.add(v.negate())
+
+    # Add the newly found pure literals as unit clauses
+    for lit in pure_lits:
+        theory.addClause([lit])
+
+
 def unit_prop(theory):
     # Separate out all of the unit clauses
     nonUnitClauses = []
