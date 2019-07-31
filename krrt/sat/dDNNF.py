@@ -8,6 +8,7 @@ class Node:
         assert None not in childs, str(childs)
         self.children = childs
         self._count = -1
+        self._nnf_index = -1
         self._replacement = None
 
     @property
@@ -18,13 +19,19 @@ class Node:
                 if bool != type(ch):
                     self._replacement |= ch.usedvars
         return self._replacement
+    
+    @property
+    def nnf_index(self):
+        assert -1 != self._nnf_index
+        return self._nnf_index
 
     def reset(self):
-        if (-1 != self._count) or (self._replacement is not None):
+        if (-1 != self._count) or (self._replacement is not None) or (self._nnf_index != -1):
             for ch in self.children:
                 if ch not in [True, False]:
                     ch.reset()
             self._count = -1
+            self._nnf_index = -1
             self._replacement = None
 
     def crawl(self, seen):
@@ -55,6 +62,28 @@ class Node:
             vals = [recursively_apply(ch) for ch in self.children]
             self._replacement = self._compress(vals)
         return self._replacement
+    
+    def dual_children(self, vals):
+        lits = set()
+        for v in filter(lambda x: isinstance(x, Lit), vals):
+            if (-1 * v.num) in lits:
+                return True
+            lits.add(v.num)
+        return False
+    
+    def assign_nnf_indices(self, nlist):
+        if self._nnf_index != -1:
+            return
+        
+        for ch in self.children:
+            ch.assign_nnf_indices(nlist)
+        
+        self._nnf_index = len(nlist)
+        nlist.append(self)
+        
+    def gen_nnf(self):
+        assert False, "Must override gen_nnf!"
+    
 
 
 class And(Node):
@@ -70,19 +99,21 @@ class And(Node):
         return self._count
 
     def _compress(self, vals):
-        new_vals = filter(lambda x: x != True, vals)
+        new_vals = list(filter(lambda x: x != True, vals))
         if False in new_vals:
             return False
         elif 0 == len(new_vals):
             return True
         elif 1 == len(new_vals):
             return new_vals[0]
+        elif self.dual_children(new_vals):
+            return False
         else:
             return And(new_vals)
 
     def is_smooth(self):
         if self._replacement is None:
-            chs = filter(lambda x: x not in [True,False], self.children)
+            chs = list(filter(lambda x: x not in [True,False], self.children))
             chvals = [ch.is_smooth() for ch in chs]
             if False in chvals:
                 return False
@@ -91,9 +122,17 @@ class And(Node):
                 subvars = subvars | ch._replacement
             self._replacement = subvars
         return True
+    
+    def gen_nnf(self):
+        return "A %d %s" % (len(self.children),
+                            ' '.join(map(str, [ch.nnf_index for ch in self.children])))
 
 
 class Or(Node):
+
+    def __init__(self, childs=[], switch_var=0):
+        super().__init__(childs=childs)
+        self.switch_var = switch_var
 
     def count(self, vars):
         if -1 == self._count:
@@ -106,19 +145,21 @@ class Or(Node):
         return self._count
 
     def _compress(self, vals):
-        new_vals = filter(lambda x: x != False, vals)
+        new_vals = list(filter(lambda x: x != False, vals))
         if True in new_vals:
             return True
         elif 0 == len(new_vals):
             return False
         elif 1 == len(new_vals):
             return new_vals[0]
+        elif self.dual_children(new_vals):
+            return True
         else:
             return Or(vals)
 
     def is_smooth(self):
         if self._replacement is None:
-            chs = filter(lambda x: x not in [True,False], self.children)
+            chs = list(filter(lambda x: x not in [True,False], self.children))
             chvals = [ch.is_smooth() for ch in chs]
             if False in chvals:
                 return False
@@ -129,17 +170,27 @@ class Or(Node):
                     return False
             self._replacement = subvars
         return True
+    
+    def gen_nnf(self):
+        return "O %d %d %s" % (len(self.children),
+                               self.switch_var,
+                               ' '.join(map(str, [ch.nnf_index for ch in self.children])))
 
 
 class Lit(Node):
 
     def __init__(self, lit):
+        super().__init__(childs=[])
         self.lit = lit
         self.reset()
 
     @property
     def usedvars(self):
         return set([self.lit.var])
+    
+    @property
+    def num(self):
+        return int(str(self.lit).replace('~','-'))
 
     def reset(self):
         self._count = -1
@@ -173,6 +224,9 @@ class Lit(Node):
     def is_smooth(self):
         self._replacement = set([self.lit.var])
         return True
+    
+    def gen_nnf(self):
+        return "L %d" % self.num
 
 
 class dDNNF:
@@ -233,6 +287,30 @@ class dDNNF:
             return True
         self.root.reset()
         return self.root.is_smooth()
+    
+    def gen_nnf(self):
+        n_list = []
+        self.root.reset()
+        self.root.assign_nnf_indices(n_list)
+        assert self.root == n_list[-1]
+        for i in range(len(n_list)):
+            assert n_list[i].nnf_index == i
+        
+        nNodes = len(n_list)
+        nVars = len(self.usedvars)
+        
+        nEdges = 0
+        for n in n_list:
+            nEdges += len(n.children)
+        
+        toRet = "nnf %d %d %d\n" % (nNodes, nEdges, nVars)
+        for n in n_list:
+            toRet += "%s\n" % n.gen_nnf()
+        
+        return toRet
+        
+
+
 
 
 def parseNNF(fname):
@@ -266,7 +344,7 @@ def parseNNF(fname):
 
         elif 'A' == parts[0]:
             nCh = int(parts[1])
-            children = map(int, parts[2:])
+            children = list(map(int, parts[2:]))
             assert nCh == len(children), "Bad line? %s" % line
             assert max(children) < len(nodes)
             nodes.append(And([nodes[i] for i in children]))
@@ -274,10 +352,10 @@ def parseNNF(fname):
         elif 'O' == parts[0]:
             switch = int(parts[1])
             nCh = int(parts[2])
-            children = map(int, parts[3:])
+            children = list(map(int, parts[3:]))
             assert nCh == len(children), "Bad line? %s" % line
             assert max(children) < len(nodes)
-            nodes.append(Or([nodes[i] for i in children]))
+            nodes.append(Or([nodes[i] for i in children], switch))
             if 0 == switch:
                 badlist.add(len(nodes) - 1)
 
