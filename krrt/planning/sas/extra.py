@@ -3,9 +3,9 @@ from krrt.utils import read_file, write_file
 from krrt.utils.experimentation import get_lines
 from krrt.planning.sas import SymbolTable, Operator
 
-from switch_graph import parseSG
-from dtg import parseDTG
-from cg import parseCG
+from .switch_graph import parseSG
+from .dtg import parseDTG
+from .cg import parseCG
 
 ####################
 # Parsing Function #

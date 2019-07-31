@@ -46,7 +46,7 @@ def parse_output_FF(file_name):
 
     # Check for the failed solution
     if match_value(file_name, '.* No plan will solve it.*'):
-        print "No solution."
+        print ("No solution.")
         return None
 
     # Get the plan
@@ -153,7 +153,7 @@ def parse_output_VAL(file_name, initialState):
             elif eff[0:6] == 'Adding':
                 adds.append(eff.split('(')[1].split(')')[0])
             else:
-                print "Error: " + eff[0:8] + " / " + eff[0:6]
+                print ("Error: " + eff[0:8] + " / " + eff[0:6])
 
         deltas.append((adds, dels))
 
@@ -167,6 +167,6 @@ def parse_output_VAL(file_name, initialState):
 #################
 # Other imports #
 #################
-import pddl
-import sas
-import strips
+from . import pddl
+from . import sas
+from . import strips

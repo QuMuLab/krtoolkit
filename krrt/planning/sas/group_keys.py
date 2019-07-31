@@ -3,7 +3,7 @@
 
 import re
 
-from myiterators import EolStripIterator, LookaheadIterator
+from .myiterators import EolStripIterator, LookaheadIterator
 
 
 class GroupKey(object):

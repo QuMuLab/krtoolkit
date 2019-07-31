@@ -161,7 +161,7 @@ def plot(x, y,
     try:
         import pylab
     except:
-        print "Error: pylab not available. Plotting features will not work."
+        print ("Error: pylab not available. Plotting features will not work.")
         return
 
     #pylab.rcParams.update(params_onecolumn)
@@ -180,12 +180,12 @@ def plot(x, y,
 
     if not col:
         if len(x) > len(SYMBOLS):
-            print "Warning: Too many types (%d) for only %d symbols." % (len(x), len(SYMBOLS))
+            print ("Warning: Too many types (%d) for only %d symbols." % (len(x), len(SYMBOLS)))
             return
 
     else:
         if len(x) > len(COLOURS):
-            print "Warning: Too many types (%d) for only %d colours." % (len(x), len(COLOURS))
+            print ("Warning: Too many types (%d) for only %d colours." % (len(x), len(COLOURS)))
             return
 
     pylab.figure(1)
@@ -326,8 +326,8 @@ if __name__ == '__main__':
     myargs, flags = get_opts()
 
     if '-csv' not in myargs:
-        print "Error: Must include a path to the csv file:"
-        print USAGE_STRING
+        print ("Error: Must include a path to the csv file:")
+        print (USAGE_STRING)
         os._exit(1)
 
     title = None

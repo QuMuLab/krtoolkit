@@ -6,7 +6,7 @@ class CG(object):
         try:
             import pygraph
         except:
-            print "Error: pygraph is not available. Advanced SAS+ reasoning requires pygraph."
+            print ("Error: pygraph is not available. Advanced SAS+ reasoning requires pygraph.")
             return None
         
         self.graph = digraph()

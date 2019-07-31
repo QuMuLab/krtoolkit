@@ -7,7 +7,7 @@
 try:
     import matplotlib.pyplot as plt
 except:
-    print "Warning: matplotlib not available. Charts will not work."
+    print ("Warning: matplotlib not available. Charts will not work.")
 
 class DynamicAreaGraph(object):
     def __init__(self, title, xs, ys, color):

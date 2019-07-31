@@ -1,5 +1,4 @@
-import pddl_types
-import tasks # for Task.FUNCTION_SYMBOLS, needed in parse_term()
+from . import pddl_types
 
 def parse_condition(alist):
     condition = parse_condition_aux(alist, False)
@@ -68,7 +67,7 @@ class Condition(object):
     def __ne__(self, other):
         return not self == other
     def dump(self, indent="  "):
-        print "%s%s" % (indent, self._dump())
+        print ("%s%s" % (indent, self._dump()))
         for part in self.parts:
             part.dump(indent + "  ")
     def _dump(self):
@@ -332,6 +331,7 @@ class NegatedAtom(Literal):
 # reachability analysis and invariant synthesis.
 
 def parse_term(term):
+    from . import tasks # for Task.FUNCTION_SYMBOLS, needed in parse_term()
     if isinstance(term, list): # when can this happen?
         return FunctionTerm(term[0],[parse_term(t) for t in term[1:]])
     elif term.startswith("?"):
@@ -345,7 +345,7 @@ class Term(object):
     def __eq__(self, other):
         return (self.__class__ == other.__class__ and self.name == other.name)
     def dump(self, indent="  "):
-        print "%s%s %s" % (indent, self._dump(), self.name)
+        print ("%s%s %s" % (indent, self._dump(), self.name))
         for arg in self.args:
             arg.dump(indent + "  ")
     def _dump(self):

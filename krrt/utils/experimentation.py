@@ -19,7 +19,7 @@ except:
             yield tuple(prod)
 
 
-from result_handlers import Result, ResultSet
+from .result_handlers import Result, ResultSet
 
 def check_memout(result):
     MEMORY_CODES = ['std::bad_alloc', 'MemoryError', 'NO MEMORY']
@@ -43,7 +43,7 @@ def get_value(file_name, regex, value_type = float):
     if results:
         return value_type(results.group(1))
     else:
-        print "Could not find the value, %s, in the file provided: %s" % (regex, file_name)
+        print ("Could not find the value, %s, in the file provided: %s" % (regex, file_name))
         return value_type(0.0)
 
 def match_value(file_name, regex):
@@ -126,7 +126,7 @@ def run_experiment( base_directory = ".",
                     ):
 
     if not base_command:
-        print "Must supply command for the experiment."
+        print ("Must supply command for the experiment.")
         return
 
     #--- Make sure the default settings are appropriate
@@ -266,7 +266,7 @@ def _run_multiple(cmds, timeout, memory, cores, progress_file, sandbox, clean_sa
             if progress_file:
                 os.system("echo \"%s\" > %s" % (message, progress_file))
             else:
-                print message
+                print (message)
 
         #-- Get the problem id
         id = todo.pop()

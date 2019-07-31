@@ -1,5 +1,5 @@
 # The following are the current sat modules available
-import CNF
-import Dimacs
-import DPLL
-import dDNNF
+from . import CNF
+from . import Dimacs
+from . import DPLL
+from . import dDNNF

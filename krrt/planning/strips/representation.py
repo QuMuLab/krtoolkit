@@ -75,7 +75,7 @@ def parse_init_state(pddl_domain_name, pddl_file_name):
             continue
 
         if Atom != init.__class__:
-            print "Error: Init condition not an Atom -- " + str(init.__class__)
+            print ("Error: Init condition not an Atom -- " + str(init.__class__))
             return set([])
 
         fluent = str(init.predicate)
@@ -93,14 +93,14 @@ def parse_goal_state(pddl_domain_name, pddl_file_name):
 
     # Only lift the goal if it is a conjunction of atoms
     if Conjunction != t.goal.__class__:
-        print "Error: Goal condition must be a conjunction of atoms -- " + str(t.goal.__class__)
+        print ("Error: Goal condition must be a conjunction of atoms -- " + str(t.goal.__class__))
         return set([])
 
     # Lift the goal state
     goals = set([])
     for g in t.goal.parts:
         if Atom != g.__class__:
-            print "Error: Goal condition not an Atom -- " + str(init.__class__)
+            print ("Error: Goal condition not an Atom -- " + str(init.__class__))
             return set([])
 
         fluent = str(g.predicate)
@@ -116,7 +116,7 @@ def parse_goal_state(pddl_domain_name, pddl_file_name):
 
 def generate_action(action, act):
 
-    print "Warning: This code is deprecated. Please report your usage to a developer."
+    print ("Warning: This code is deprecated. Please report your usage to a developer.")
 
     params = act.arguments
 
@@ -141,7 +141,7 @@ def generate_action(action, act):
         elif eff.literal.__class__ == Atom:
             ADD.add(Fluent(name))
         else:
-            print "Error: Effect isn't an Atom or NegatedAtom: %s" % str(eff.literal.__class__)
+            print ("Error: Effect isn't an Atom or NegatedAtom: %s" % str(eff.literal.__class__))
             return None
 
     return Action(PRE, ADD, DEL, ' '.join([act.operator] + act.arguments))

@@ -1,2 +1,2 @@
-import backtrack
-import localsearch
+from . import backtrack
+from . import localsearch

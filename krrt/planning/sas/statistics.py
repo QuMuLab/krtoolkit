@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sas_tasks
+from . import sas_tasks
 
 class Statistics(object):
     def __init__(self, task):
@@ -20,14 +20,14 @@ class Statistics(object):
         self.no_axioms = len(task.axioms)
 
     def print_human_friendly(self):
-        print "%s:" % self.name
+        print ("%s:" % self.name)
         for entry in self._entries():
-            print entry
-        print
+            print (entry)
+        print()
 
     def print_grep_friendly(self):
         for entry in self._entries():
-            print "%s: %s" % (self.name, entry)
+            print ("%s: %s" % (self.name, entry))
 
     def _entries(self):
         yield "%8d variables" % self.no_vars

@@ -1,12 +1,12 @@
 import sys
 
-import actions
-import axioms
-import conditions
-import predicates
-import pddl_types
-import functions
-import f_expression
+from . import actions
+from . import axioms
+from . import conditions
+from . import predicates
+from . import pddl_types
+from . import functions
+from . import f_expression
 
 class Task(object):
     FUNCTION_SYMBOLS = dict()
@@ -48,30 +48,30 @@ class Task(object):
                     predicates, functions, init, goal, actions, axioms, use_metric)
 
     def dump(self):
-        print "Problem %s: %s [%s]" % (self.domain_name, self.task_name,
-                                       self.requirements)
-        print "Types:"
+        print ("Problem %s: %s [%s]" % (self.domain_name, self.task_name,
+                                       self.requirements))
+        print ("Types:")
         for type in self.types:
-            print "  %s" % type
-        print "Objects:"
+            print ("  %s" % type)
+        print ("Objects:")
         for obj in self.objects:
-            print "  %s" % obj
-        print "Predicates:"
+            print ("  %s" % obj)
+        print ("Predicates:")
         for pred in self.predicates:
-            print "  %s" % pred
-        print "Functions:"
+            print ("  %s" % pred)
+        print ("Functions:")
         for func in self.functions:
-            print "  %s" % func
-        print "Init:"
+            print ("  %s" % func)
+        print ("Init:")
         for fact in self.init:
-            print "  %s" % fact
-        print "Goal:"
+            print ("  %s" % fact)
+        print ("Goal:")
         self.goal.dump()
-        print "Actions:"
+        print ("Actions:")
         for action in self.actions:
             action.dump()
         if self.axioms:
-            print "Axioms:"
+            print ("Axioms:")
             for axiom in self.axioms:
                 axiom.dump()
 
@@ -183,7 +183,7 @@ def parse_task(task_pddl):
         if fact[0] == "=":
             try:
                 initial.append(f_expression.parse_assignment(fact))
-            except ValueError, e:
+            except ValueError as e:
                 raise SystemExit("Error in initial state specification\n" +
                                  "Reason: %s." %  e)
         else:

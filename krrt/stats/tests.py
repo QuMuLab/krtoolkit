@@ -26,7 +26,7 @@ def anova(results, factors, dependent = None, cleanup = True):
     try:
         import rpy2.robjects as robjects
     except:
-        print "Error: rpy2 not available. Advanced statistical testing will not work."
+        print ("Error: rpy2 not available. Advanced statistical testing will not work.")
         return None
     
     dependent = dependent or results[0][-1]
@@ -45,16 +45,16 @@ def anova(results, factors, dependent = None, cleanup = True):
 
     robjects.r(command)
     
-    print robjects.r('aov1')
+    print (robjects.r('aov1'))
     summary = robjects.r('summary(aov1)').__str__()
-    print summary
+    print (summary)
     
     results = [item.split()[0] for item in filter(lambda x: '*' in x[-3:] or '.' in x[-3:], summary.split("\n"))]
 
     for res in results:
         command = "tuk=TukeyHSD(aov1,which=\"%s\",conf.level=0.995)" % res
         robjects.r(command)
-        print robjects.r('tuk')
+        print (robjects.r('tuk'))
     
     #--- Remove the file
     if cleanup:
@@ -101,7 +101,7 @@ def randomized_pairwise_t_test(arr1, arr2, output=True):
     ratio = float(numLess + 1) / float(10001)
     ratio = min(ratio, 1-ratio)
     if output:
-        print "mean difference: %f\nsignificant at p <= %f" % (originalMean, ratio)
+        print ("mean difference: %f\nsignificant at p <= %f" % (originalMean, ratio))
     
     return originalMean, ratio
     

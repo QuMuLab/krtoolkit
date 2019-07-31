@@ -136,7 +136,7 @@ class DPLL:
         elif voh == 'vsids':
             self.pick_var = self.vsids_pick_var
         else:
-            print "Error: Unknown variable ordering heuristic, %s" % voh
+            print ("Error: Unknown variable ordering heuristic, %s" % voh)
             sys.exit(0)
 
     def solve(self, use_gui, display_search_tree, disable_results):
@@ -147,15 +147,15 @@ class DPLL:
         sols = self.solve_complex(self.clauses, self.variables, 0)
 
         if 1 == len(sols):
-            print str(self.NODE_COUNT) + ",1"
+            print (str(self.NODE_COUNT) + ",1")
 
         if disable_results:
             return
 
-        print "Nodes Expanded: " + str(self.NODE_COUNT)
-        print "# of Backtracks: " + str(self.BACKTRACK_COUNT)
-        print "Max Depth: " + str(self.MAX_DEPTH)
-        print "Avg Depth: " + str(self.SUM_DEPTH / self.NODE_COUNT)
+        print ("Nodes Expanded: " + str(self.NODE_COUNT))
+        print ("# of Backtracks: " + str(self.BACKTRACK_COUNT))
+        print ("Max Depth: " + str(self.MAX_DEPTH))
+        print ("Avg Depth: " + str(self.SUM_DEPTH / self.NODE_COUNT))
 
         #if display_results:
         if False:
@@ -188,11 +188,11 @@ class DPLL:
             #TW.batch_unbounded(genDirListFromDepth(self.DEPTH_LEVELS))
 
 
-        print "\n\nSolution:"
+        print ("\n\nSolution:")
         if self.timedout:
-            print " -timeout- "
+            print (" -timeout- ")
         else:
-            print sols
+            print (sols)
 
     def solve_complex(self, clause_list, variable_list, depth_num):
         #------------ DEBUG ---------------
@@ -202,7 +202,7 @@ class DPLL:
 
         if depth_num > self.MAX_DEPTH:
             self.MAX_DEPTH = depth_num
-            print str(self.NODE_COUNT) + "," + str(float(self.MAX_DEPTH) / float(self.TARGET_DEPTH))
+            print (str(self.NODE_COUNT) + "," + str(float(self.MAX_DEPTH) / float(self.TARGET_DEPTH)))
             #print str(clock() - self.start_time) + "," + str(float(self.MAX_DEPTH) / float(self.TARGET_DEPTH))
             #print str(clock() - self.start_time) + "," + str(self.MAX_DEPTH)
             #print str(self.NODE_COUNT) + "," + str(self.MAX_DEPTH)
@@ -213,7 +213,7 @@ class DPLL:
 
             if self.timedout == False:
 
-                print str(self.NODE_COUNT) + "," + str(float(self.MAX_DEPTH) / float(self.TARGET_DEPTH))
+                print (str(self.NODE_COUNT) + "," + str(float(self.MAX_DEPTH) / float(self.TARGET_DEPTH)))
                 #print str(clock() - self.start_time) + "," + str(self.MAX_DEPTH)
                 #print str(self.NODE_COUNT) + "," + str(self.MAX_DEPTH)
 
@@ -229,8 +229,8 @@ class DPLL:
 
         #--- Consistency check
         if 0 == len(variable_list):
-            print "Error: Remaining clauses and no variables.\n Clause list:"
-            print clause_list
+            print ("Error: Remaining clauses and no variables.\n Clause list:")
+            print (clause_list)
             sys.exit(0)
 
         #--- Pick our variable
@@ -238,7 +238,7 @@ class DPLL:
         var = variable_list[ind]
 
         if self.debug:
-            print "Variable and setting picked: " + str(var * sign)
+            print ("Variable and setting picked: " + str(var * sign))
 
         #--- Set the variable in the clauses
         conflict, new_clause_list = self.set_variable(clause_list, var, sign)
@@ -333,10 +333,10 @@ class DPLL:
                 new_clause_list.append(clause.copy())
 
         if self.debug:
-            print "Clause list before resolving with " + str(var * sign) + ":"
-            print cls_list
-            print "...and after:"
-            print new_clause_list
+            print ("Clause list before resolving with " + str(var * sign) + ":")
+            print (cls_list)
+            print ("...and after:")
+            print (new_clause_list)
 
         return False, new_clause_list
 
@@ -392,8 +392,8 @@ if __name__ == '__main__':
     myargs, flags = getopts(argv)
 
     if not myargs.has_key('-i'):
-        print "Must specify input:"
-        print USAGE_STRING
+        print ("Must specify input:")
+        print (USAGE_STRING)
         os._exit(1)
 
     use_gui = True

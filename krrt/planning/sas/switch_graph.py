@@ -61,7 +61,7 @@ class SG(object):
         try:
             from pygraph.classes.digraph import digraph
         except:
-            print "Error: pygraph not available. Advanced SAS+ reasoning will not work."
+            print ("Error: pygraph not available. Advanced SAS+ reasoning will not work.")
             return None
         
         self.graph = digraph()

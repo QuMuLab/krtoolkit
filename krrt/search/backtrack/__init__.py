@@ -1,1 +1,1 @@
-import viz
+from . import viz

@@ -127,7 +127,7 @@ class Formula:
         elif 'litsort' == method:
             self._minimizeClauseWidth_LitSort(invert, avg)
         else:
-            print "Error: Unknown clause-width minimization technique -- " + method
+            print ("Error: Unknown clause-width minimization technique -- " + method)
 
 
 

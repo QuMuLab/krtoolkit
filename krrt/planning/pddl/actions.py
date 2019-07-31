@@ -2,9 +2,9 @@
 
 import copy
 
-import conditions
-import effects
-import pddl_types
+from . import conditions
+from . import effects
+from . import pddl_types
 
 class Action(object):
     def __init__(self, name, parameters, precondition, effects, cost):
@@ -40,31 +40,31 @@ class Action(object):
         eff = []
         try:
             cost = effects.parse_effects(effect_list, eff)
-        except ValueError, e:
+        except ValueError as e:
             raise SystemExit("Error in Action %s\nReason: %s." % (name, e))
         for rest in iterator:
             assert False, rest
         return Action(name, parameters, precondition, eff, cost)
     parse = staticmethod(parse)
     def dump(self):
-        print "%s(%s)" % (self.name, ", ".join(map(str, self.parameters)))
-        print "Precondition:"
+        print ("%s(%s)" % (self.name, ", ".join(map(str, self.parameters))))
+        print ("Precondition:")
         self.precondition.dump()
-        print "Effects:"
+        print ("Effects:")
         for eff in self.effects:
             eff.dump()
-        print "Cost:"
+        print ("Cost:")
         if(self.cost):
             self.cost.dump()
         else:
-            print "  None"
+            print ("  None")
     def uniquify_variables(self):
         self.type_map = dict([(par.name, par.type) for par in self.parameters])
         self.precondition = self.precondition.uniquify_variables(self.type_map)
         for effect in self.effects:
             effect.uniquify_variables(self.type_map)
     def unary_actions(self):
-        # TODO: An neue Effect-Repräsentation anpassen.
+        # TODO: An neue Effect-Reprï¿½sentation anpassen.
         result = []
         for i, effect in enumerate(self.effects):
             unary_action = copy.copy(self)
@@ -152,11 +152,11 @@ class PropositionalAction:
                 self.del_effects.append((condition, effect.negate()))
         self.cost = cost
     def dump(self):
-        print self.name
+        print (self.name)
         for fact in self.precondition:
-            print "PRE: %s" % fact
+            print ("PRE: %s" % fact)
         for cond, fact in self.add_effects:
-            print "ADD: %s -> %s" % (", ".join(map(str, cond)), fact)
+            print ("ADD: %s -> %s" % (", ".join(map(str, cond)), fact))
         for cond, fact in self.del_effects:
-            print "DEL: %s -> %s" % (", ".join(map(str, cond)), fact)
-        print "cost:", self.cost
+            print ("DEL: %s -> %s" % (", ".join(map(str, cond)), fact))
+        print ("cost:", self.cost)

@@ -4,10 +4,10 @@
 from __future__ import with_statement
 from collections import defaultdict
 
-import build_model
-import pddl_to_prolog
+from . import build_model
+from . import pddl_to_prolog
 from krrt.planning import pddl
-import timers
+from . import timers
 
 def get_fluent_facts(task, model):
     fluent_predicates = set()
@@ -83,17 +83,17 @@ if __name__ == "__main__":
 
     task = pddl.open()
     relaxed_reachable, atoms, actions, axioms, _ = explore(task)
-    print "goal relaxed reachable: %s" % relaxed_reachable
-    print "%d atoms:" % len(atoms)
+    print ("goal relaxed reachable: %s" % relaxed_reachable)
+    print ("%d atoms:" % len(atoms))
     for atom in atoms:
-        print " ", atom
-    print
-    print "%d actions:" % len(actions)
+        print (" ", atom)
+    print()
+    print ("%d actions:" % len(actions))
     for action in actions:
         action.dump()
         print
-    print
-    print "%d axioms:" % len(axioms)
+    print()
+    print ("%d axioms:" % len(axioms))
     for axiom in axioms:
         axiom.dump()
-        print
+        print()

@@ -41,4 +41,4 @@ if __name__ == "__main__":
     g.connect(1, 2)
     g.connect(1, 3)
     g.connect(4, 5)
-    print g.connected_components()
+    print (g.connected_components())

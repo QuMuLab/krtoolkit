@@ -48,4 +48,4 @@ def print_nested_list(nested_list):
             pendingspace = True
 
     for line in wrap_lines(stream.getvalue().splitlines()):
-        print line
+        print (line)

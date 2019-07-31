@@ -1,5 +1,5 @@
 import re
-from CNF import *
+from .CNF import *
 
 def nullCNF():
     """Return a default CNF Formula (no clauses / variables)"""

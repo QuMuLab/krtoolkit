@@ -4,8 +4,8 @@
 import itertools
 import os.path
 
-from myiterators import EolStripIterator, LookaheadIterator
-import group_keys
+from .myiterators import EolStripIterator, LookaheadIterator
+from . import group_keys
 
 
 class SasTask(object):
@@ -19,25 +19,25 @@ class SasTask(object):
         self.metric = metric
 
     def dump(self):
-        print "Task %s" % self.name
-        print "Variables:"
+        print ("Task %s" % self.name)
+        print ("Variables:")
         for var in self.variables:
-            print "  %s" % var
-        print
-        print "Init:"
+            print ("  %s" % var)
+        print()
+        print ("Init:")
         for prop in self.initial_state:
-            print "  %s" % prop
-        print
-        print "Goals:"
+            print ("  %s" % prop)
+        print()
+        print ("Goals:")
         for prop in self.goals:
-            print "  %s" % prop
-        print
+            print ("  %s" % prop)
+        print()
         for op in self.operators:
             op.dump()
-            print
+            print()
         for axiom in self.axioms:
             axiom.dump()
-            print
+            print()
 
 
 class Variable(object):
@@ -82,15 +82,15 @@ class Operator(object):
         self.cost = cost
 
     def dump(self):
-        print self.name
+        print (self.name)
         for precond in self.precond:
-            print "  PRE: %s" % precond
+            print ("  PRE: %s" % precond)
         for conds, effect in self.effects:
             if conds:
                 cond_spec = ", ".join(map(str, conds))
             else:
                 cond_spec = ""
-            print "  EFF: %s%s" % (cond_spec, effect)
+            print ("  EFF: %s%s" % (cond_spec, effect))
 
 
 class Axiom(object):
@@ -100,15 +100,16 @@ class Axiom(object):
 
     def dump(self):
         for cond in self.cond:
-            print "  IFCOND: %s" % cond
-        print "  DERIVE: %s" % self.derive
+            print ("  IFCOND: %s" % cond)
+        print ("  DERIVE: %s" % self.derive)
 
 
 class SymbolTable(object):
     def __init__(self, variables):
         self.variables = variables
 
-    def __getitem__(self, (var_no, value_no)):
+    def __getitem__(self, varval):
+        (var_no, value_no) = varval
         # Don't allow indexing with negative indices.
         assert 0 <= var_no < len(self.variables)
         var = self.variables[var_no]
