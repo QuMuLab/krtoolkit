@@ -10,7 +10,7 @@ class ScatterPlot(object):
         try:
             import matplotlib.pyplot as plt
         except:
-            print "Error: matplotlib not available. Charts will not work."
+            print ("Error: matplotlib not available. Charts will not work.")
             return None
         # Todo: Write me
         pass
