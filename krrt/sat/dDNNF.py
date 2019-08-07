@@ -194,6 +194,7 @@ class Lit(Node):
 
     def reset(self):
         self._count = -1
+        self._nnf_index = -1
         self._replacement = None
 
     def crawl(self, seen):
