@@ -172,8 +172,8 @@ class Or(Node):
         return True
     
     def gen_nnf(self):
-        return "O %d %d %s" % (len(self.children),
-                               self.switch_var,
+        return "O %d %d %s" % (self.switch_var,
+                               len(self.children),
                                ' '.join(map(str, [ch.nnf_index for ch in self.children])))
 
 
