@@ -51,6 +51,17 @@ class Node:
             vals = [recursively_apply(ch) for ch in self.children]
             self._replacement = self._compress(vals)
         return self._replacement
+    
+    def forget(self, vars):
+        if self._replacement is None:
+            def recursively_apply(ch):
+                if ch in [True, False]:
+                    return ch
+                else:
+                    return ch.forget(vars)
+            vals = [recursively_apply(ch) for ch in self.children]
+            self._replacement = self._compress(vals)
+        return self._replacement
 
     def simplify(self):
         if self._replacement is None:
@@ -109,7 +120,13 @@ class And(Node):
         elif self.dual_children(new_vals):
             return False
         else:
-            return And(new_vals)
+            final_vals = []
+            for ch in new_vals:
+                if isinstance(ch, And):
+                    final_vals.extend(ch.children)
+                else:
+                    final_vals.append(ch)
+            return And(final_vals)
 
     def is_smooth(self):
         if self._replacement is None:
@@ -155,7 +172,13 @@ class Or(Node):
         elif self.dual_children(new_vals):
             return True
         else:
-            return Or(vals)
+            final_vals = []
+            for ch in new_vals:
+                if isinstance(ch, Or):
+                    final_vals.extend(ch.children)
+                else:
+                    final_vals.append(ch)
+            return Or(final_vals)
 
     def is_smooth(self):
         if self._replacement is None:
@@ -213,6 +236,14 @@ class Lit(Node):
                 self._replacement = True
             elif self.lit.negate() in lits:
                 self._replacement = False
+            else:
+                self._replacement = Lit(self.lit)
+        return self._replacement
+    
+    def forget(self, vars):
+        if self._replacement is None:
+            if self.lit.var in vars:
+                self._replacement = True
             else:
                 self._replacement = Lit(self.lit)
         return self._replacement
@@ -276,6 +307,12 @@ class dDNNF:
             return dDNNF(self.root, self.allvars - set([l.var for l in lits]))
         self.root.reset()
         return dDNNF(self.root.condition(lits), self.allvars - set([l.var for l in lits]))
+    
+    def forget(self, vars):
+        if bool == type(self.root):
+            return dDNNF(self.root, self.allvars - set(vars))
+        self.root.reset()
+        return dDNNF(self.root.forget(vars), self.allvars - set(vars))
 
     def simplify(self):
         if bool == type(self.root):
