@@ -17,7 +17,7 @@ class Node:
             self._replacement = set()
             for ch in self.children:
                 if bool != type(ch):
-                    self._replacement |= ch.usedvars
+                    self._replacement = self._replacement | ch.usedvars
         return self._replacement
     
     @property
@@ -91,6 +91,26 @@ class Node:
         
         self._nnf_index = len(nlist)
         nlist.append(self)
+
+    def ensure_vars(self, vars):
+        if 0 == len(vars):
+            return self
+        elif isinstance(self, And):
+            parent = self
+        elif isinstance(self, Lit) or isinstance(self, Or):
+            parent = And([self])
+            parent = parent.smooth()
+        else:
+            assert False, "Not sure how to ensure variables for node type %s" % str(type(self))
+
+        new_children = []
+        for v in vars:
+            new_children.append(Or([Lit(v), Lit(v.negate())]))
+
+        new_parent = And(parent.children + new_children)
+        new_parent = new_parent.smooth()
+
+        return new_parent
         
     def gen_nnf(self):
         assert False, "Must override gen_nnf!"
@@ -127,6 +147,17 @@ class And(Node):
                 else:
                     final_vals.append(ch)
             return And(final_vals)
+
+    def smooth(self):
+        if self._replacement is None:
+            new_vals = []
+            new_vars = set()
+            for ch in self.children:
+                new_vals.append(ch.smooth())
+                new_vars = new_vars | new_vals[-1]._vars
+            self._replacement = And(new_vals)
+            self._replacement._vars = new_vars
+        return self._replacement
 
     def is_smooth(self):
         if self._replacement is None:
@@ -179,6 +210,18 @@ class Or(Node):
                 else:
                     final_vals.append(ch)
             return Or(final_vals)
+
+    def smooth(self):
+        if self._replacement is None:
+            new_vals = []
+            new_vars = set()
+            for ch in self.children:
+                new_vals.append(ch.smooth())
+                new_vars = new_vars | new_vals[-1]._vars
+            final_vals = [ch.ensure_vars(new_vars - ch._vars) for ch in new_vals]
+            self._replacement = Or(final_vals)
+            self._replacement._vars = new_vars
+        return self._replacement
 
     def is_smooth(self):
         if self._replacement is None:
@@ -253,6 +296,12 @@ class Lit(Node):
             self._replacement = Lit(self.lit)
         return self._replacement
 
+    def smooth(self):
+        if self._replacement is None:
+            self._replacement = Lit(self.lit)
+            self._replacement._vars = set([self.lit.var])
+        return self._replacement
+
     def is_smooth(self):
         self._replacement = set([self.lit.var])
         return True
@@ -319,6 +368,24 @@ class dDNNF:
             return dDNNF(self.root, self.allvars)
         self.root.reset()
         return dDNNF(self.root.simplify(), self.allvars)
+
+    def smooth(self):
+        if bool == type(self.root):
+            return dDNNF(self.root, self.allvars)
+
+        # Simplify before smoothing
+        self.root.reset()
+        simp_root = self.root.simplify()
+
+        # Smooth
+        simp_root.reset()
+        smooth_root = simp_root.smooth()
+        smooth_root = smooth_root.ensure_vars(self.allvars - smooth_root._vars)
+        smooth_root.reset()
+
+        assert len(self.allvars) == len(smooth_root._vars)
+
+        return dDNNF(smooth_root, self.allvars)
 
     def is_smooth(self):
         if bool == type(self.root):
